@@ -111,7 +111,7 @@ impl Engine {
         (num, end)
     }
 
-    fn sum_of_all_parts(&self) -> u32 {
+    pub(crate) fn sum_of_all_parts(&self) -> u32 {
         let mut sum = 0;
         for (line_num, line) in self.input.iter().enumerate() {
             let mut i = 0;
@@ -127,7 +127,7 @@ impl Engine {
         sum
     }
 
-    fn sum_all_gears(&self) -> u32 {
+    pub(crate) fn sum_all_gears(&self) -> u32 {
         let mut sum = 0;
         for (line_num, line) in self.input.iter().enumerate() {
             let mut i = 0;
@@ -145,9 +145,7 @@ impl Engine {
 }
 mod test {
 
-    use crate::file_input_iterator::FileContent;
-
-    use super::*;
+    use crate::{day3::Engine, file_input_iterator::FileContent};
 
     #[test]
     fn test_first_with_local_data() {
