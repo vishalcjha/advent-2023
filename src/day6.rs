@@ -132,6 +132,7 @@ impl RaceCalculatorBuilder {
         total_ways.unwrap_or(0)
     }
 }
+
 #[cfg(test)]
 mod test {
     use crate::file_input_iterator::FileContent;

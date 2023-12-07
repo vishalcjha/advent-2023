@@ -83,3 +83,12 @@ A classic binary search problem. In simplified terms you have given a sorted lis
 Right end can be found in similar way.
 
 More instrestingly variance comes into play with lifetime and reference. Will need to find time to describe the problem.
+
+### Day 7
+I have tried to keep interface of program same so that it can be used by both scenario.
+In this case, it is proved a bit tricky.
+I have a type Card which store card value and CardType which is hand type eg. "Five of a kind"
+Once we use joken comparision value of J changes. It becomes the lowest.
+I played with `Generic const` of type bool. Though now my interface is consistent, I endup having lots of boilerplate for each variant of generic aks true or false.
+
+Will come back to this.
