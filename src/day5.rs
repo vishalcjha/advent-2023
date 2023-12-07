@@ -75,29 +75,24 @@ impl SeedConversion {
     }
 
     pub fn get_min_location(&self) -> u128 {
-        let mut locations = vec![];
-        let min_location = None;
+        let mut min_location = None;
         for seed in self.seeds.iter() {
             let conversion = self
                 .get_conversion_by_seed(*seed, "location".to_owned())
                 .unwrap();
-            locations.push(conversion);
-            // TODO: What is bug here ???
-            // match min_location.take() {
-            //     Some(v) => {
-            //         if conversion < v {
-            //             min_location = Some(conversion);
-            //         }
-            //     }
-            //     None => {
-            //         min_location = Some(conversion);
-            //     }
-            // }
+            match min_location.as_mut() {
+                Some(v) => {
+                    if conversion < *v {
+                        *v = conversion;
+                    }
+                }
+                None => {
+                    min_location = Some(conversion);
+                }
+            }
         }
-        locations.sort();
 
-        println!("{:?}", min_location);
-        *locations.iter().next().unwrap()
+        min_location.unwrap()
     }
 
     fn get_conversion_by_seed(&self, seed: u128, dst: String) -> Option<u128> {

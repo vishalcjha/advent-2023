@@ -51,3 +51,35 @@ let parsed_numbers = line.split_ascii_whitespace()
                           .filter_map(|num| num.parse::<u32>().ok())
                           .collect::<Vec<_>>();
 ```
+
+#### Day 6
+A classic binary search problem. In simplified terms you have given a sorted list of numbers. You have a single possible set of indices which matches creteria. How would you find it. I will define how to find left most indices.
+```
+    pub(self) fn find_left_end(&self, left: u128, right: u128) -> Option<u128> {
+        let mut smallest_winning_left = None;
+        if left <= right {
+            let mid = left + (right - left) / 2;
+
+            if self.will_win_in_time(mid) {
+                // if mid is solution, check indices before mid for answer.
+                smallest_winning_left = smallest_winning_left.or(Some(mid));
+                if let Some(other_possible) = self.find_left_end(left, mid - 1) {
+                    smallest_winning_left =
+                        smallest_winning_left.and_then(|current| Some(current.min(other_possible)));
+                }
+            } else {
+                // if mid is not solution, first try range before mid if not try range after mid.
+                if let Some(other_possible) = self.find_left_end(left, mid - 1) {
+                    smallest_winning_left =
+                        smallest_winning_left.and_then(|current| Some(current.min(other_possible)));
+                } else {
+                    smallest_winning_left = self.find_left_end(mid + 1, right)
+                }
+            }
+        }
+        smallest_winning_left
+    }
+```
+Right end can be found in similar way.
+
+More instrestingly variance comes into play with lifetime and reference. Will need to find time to describe the problem.
