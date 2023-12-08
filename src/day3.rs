@@ -144,7 +144,6 @@ impl Engine {
     }
 }
 mod test {
-
     use crate::{day3::Engine, file_input_iterator::FileContent};
 
     #[test]

@@ -1,5 +1,6 @@
 #![allow(dead_code)]
 
+use itertools::Itertools;
 #[derive(Debug)]
 struct SourceDestLen {
     src: u128,
@@ -19,9 +20,12 @@ impl SourceDestLen {
     }
 }
 
+#[derive(Debug, Clone)]
+struct Range(u128, u128, u128);
+
 #[derive(Debug)]
 struct SeedConversion {
-    seeds: Vec<u128>,
+    seeds: Vec<Range>,
     conversion_sequence: Vec<String>,
     conversion_distonary: Vec<Vec<SourceDestLen>>,
     new_map_coming: bool,
@@ -35,13 +39,27 @@ impl SeedConversion {
         }
         if line.starts_with("seeds") {
             self.conversion_sequence.push("seeds".to_owned());
-            self.seeds = line
+            let iter = line
                 .split(":")
                 .last()
                 .unwrap()
                 .split_ascii_whitespace()
-                .filter_map(|num| num.parse::<u128>().ok())
-                .collect();
+                .filter_map(|num| num.parse::<u128>().ok());
+            let mut seeds = Vec::new();
+            if seed_as_pair {
+                for from_to in &iter.chunks(2) {
+                    let mut from_to = from_to.into_iter();
+                    let src = from_to.next().unwrap();
+                    let len = from_to.next().unwrap();
+                    seeds.push(Range(src, src + len, len));
+                }
+            } else {
+                for num in iter {
+                    seeds.push(Range(num, num + 1, 1));
+                }
+            }
+
+            self.seeds = seeds;
             return;
         }
 
@@ -77,9 +95,7 @@ impl SeedConversion {
     pub fn get_min_location(&self) -> u128 {
         let mut min_location = None;
         for seed in self.seeds.iter() {
-            let conversion = self
-                .get_conversion_by_seed(*seed, "location".to_owned())
-                .unwrap();
+            let conversion = self.get_min_conversion(seed, 0);
             match min_location.as_mut() {
                 Some(v) => {
                     if conversion < *v {
@@ -95,26 +111,79 @@ impl SeedConversion {
         min_location.unwrap()
     }
 
-    fn get_conversion_by_seed(&self, seed: u128, dst: String) -> Option<u128> {
-        let mut looking_for = seed;
-        for (current_dict, current_dst) in self
-            .conversion_distonary
-            .iter()
-            .zip(self.conversion_sequence.iter().skip(1))
-        {
-            for src_dst_len in current_dict {
-                if looking_for >= src_dst_len.src && looking_for < src_dst_len.src_end {
-                    let diff = looking_for - src_dst_len.src;
-                    looking_for = src_dst_len.dst + diff;
-                    break;
-                }
-            }
-            if current_dst == &dst {
-                return Some(looking_for);
+    pub(self) fn find_overlap(&self, src: &Range, dst: &SourceDestLen) -> Option<(Range, Range)> {
+        if dst.src >= src.1 || dst.src + dst.len <= src.0 {
+            return None;
+        }
+
+        let start = src.0.max(dst.src);
+        let end = (src.1).min(dst.src + dst.len);
+        let offset = start - dst.src;
+        let len = end - start;
+        if len == 0 {
+            panic!("Going to do bad {:?} {:?}", src, dst);
+        }
+        Some((
+            Range(dst.dst + offset, dst.dst + offset + len, len),
+            Range(dst.src + offset, dst.src + offset + len, len),
+        ))
+    }
+
+    pub(self) fn find_missing_ranges(&self, src: &Range, found_ranges: &Vec<Range>) -> Vec<Range> {
+        if found_ranges.is_empty() {
+            return vec![src.clone()];
+        }
+
+        let mut missing_range = Vec::new();
+
+        if found_ranges[0].0 > src.0 {
+            missing_range.push(Range(src.0, found_ranges[0].0, found_ranges[0].0 - src.0));
+        }
+
+        for (index, found) in found_ranges.iter().skip(1).enumerate() {
+            if found.0 > found_ranges[index].1 {
+                missing_range.push(Range(
+                    found_ranges[index].1,
+                    found.0 + 1,
+                    found.0 + 1 - found_ranges[index].1,
+                ));
             }
         }
 
-        None
+        let last_range = found_ranges.last().unwrap();
+
+        if last_range.1 < src.1 {
+            missing_range.push(Range(last_range.1, src.1, src.1 - last_range.1));
+        }
+
+        missing_range
+    }
+
+    pub fn get_min_conversion(&self, items: &Range, dict_pos: u8) -> u128 {
+        if dict_pos >= self.conversion_distonary.len() as u8 {
+            return items.0;
+        }
+
+        let dict = &self.conversion_distonary[dict_pos as usize];
+
+        let mut sub_ranges = Vec::new();
+        let mut matched_ranges = Vec::new();
+        for src_dst_len in dict {
+            if let Some((sub_range, matched_sub_ranges)) = self.find_overlap(&items, src_dst_len) {
+                sub_ranges.push(sub_range);
+                matched_ranges.push(matched_sub_ranges);
+            }
+        }
+
+        matched_ranges.sort_by_key(|range| range.0);
+        sub_ranges.append(&mut self.find_missing_ranges(&items, &matched_ranges));
+        sub_ranges.sort_by_key(|range| range.0);
+
+        sub_ranges
+            .into_iter()
+            .map(|range| self.get_min_conversion(&range, dict_pos + 1))
+            .min()
+            .unwrap()
     }
 }
 
@@ -232,7 +301,7 @@ mod test {
             let _ = seed_conversion.process_line(each, true);
         }
 
-        assert_eq!(35, seed_conversion.get_min_location());
+        assert_eq!(46, seed_conversion.get_min_location());
     }
 
     #[test]
@@ -244,6 +313,6 @@ mod test {
             let _ = seed_conversion.process_line(each, true);
         }
 
-        println!("Answer1 for day5 is {}", seed_conversion.get_min_location());
+        println!("Answer2 for day5 is {}", seed_conversion.get_min_location());
     }
 }
