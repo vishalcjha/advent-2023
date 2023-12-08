@@ -92,3 +92,31 @@ Once we use joken comparision value of J changes. It becomes the lowest.
 I played with `Generic const` of type bool. Though now my interface is consistent, I endup having lots of boilerplate for each variant of generic aks true or false.
 
 Will come back to this.
+
+### Day 8
+Ok first wound from Challange II. I did not see repeating pattern.
+First approach was simple one step at a time from list of starting points.
+In second approach, I tried to make a loop fast by storing all Z end string reachable from given starting points for whole path of L and R. This resulted in few lookups and comparision for whole path.
+I tried thinking about possibility of DP, but nothing there. Then finally for first time it was time to check internet. Though coding solution was trivial, however I missed repeating pattern completely. I am bit unhappy with what I found as answer. It does not leave a place for unsolvable input. But on other hand happy to learn one more way to look when stuck.
+I like custom type to hold logic. This holds true in this problem, where we can make 'L' to mean something and 'R' to mean something. One better approach is 
+```
+
+#[derive(Debug)]
+enum Direction {
+    Left,
+    Right,
+}
+
+impl Direction {
+    fn new(dir: char) -> Direction {
+        if dir == 'L' {
+            return Direction::Left;
+        }
+
+        // we can make new to return Option or Result of Direction.
+        assert!(dir == 'R');
+        Direction::Right
+    }
+}
+```
+

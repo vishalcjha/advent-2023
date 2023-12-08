@@ -144,6 +144,7 @@ impl Engine {
     }
 }
 mod test {
+    #![allow(unused_imports)]
     use crate::{day3::Engine, file_input_iterator::FileContent};
 
     #[test]

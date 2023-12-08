@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 use std::{fs::read_to_string, path::PathBuf};
 
 pub(super) struct FileContent(pub String);

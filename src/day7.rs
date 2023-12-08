@@ -95,7 +95,7 @@ impl Card<true> {
 impl Card<false> {
     fn new(value: impl Into<String>) -> Card<false> {
         let value: String = value.into();
-        let mut c_type = CardType::new(&value);
+        let c_type = CardType::new(&value);
 
         Card { value, c_type }
     }
@@ -205,7 +205,7 @@ impl Game<true> {
 }
 
 impl Game<false> {
-    pub fn add_new_card(&mut self, line: &str, use_joken: bool) {
+    pub fn add_new_card(&mut self, line: &str, _use_joken: bool) {
         let mut iter = line.split_ascii_whitespace().take(2);
         let card = iter.next().unwrap();
         let bet = iter.next().unwrap().parse::<u32>().unwrap();
