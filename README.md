@@ -120,3 +120,8 @@ impl Direction {
 }
 ```
 
+### Day 9
+Thankfully no trick for Saturday.
+Well I did find how to read vec in reverse in Rust
+`some_vec.iter().rev()` will read in reverse.
+NYC has nice sun today. Time to get much needed day light.
