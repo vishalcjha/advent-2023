@@ -74,12 +74,12 @@ impl RaceCalculator {
     }
 }
 
-struct RaceCalculatorBuilder {
-    lines: Vec<String>,
+struct RaceCalculatorBuilder<'a> {
+    lines: Vec<&'a str>,
     pos: u8,
 }
 
-impl RaceCalculatorBuilder {
+impl<'a> RaceCalculatorBuilder<'a> {
     fn new() -> Self {
         RaceCalculatorBuilder {
             lines: Vec::new(),
@@ -87,8 +87,8 @@ impl RaceCalculatorBuilder {
         }
     }
 
-    fn add_next_line(&mut self, line: &str) {
-        self.lines.push(line.to_string());
+    fn add_next_line<'b>(&'b mut self, line: &'a str) {
+        self.lines.push(line);
         self.pos += 1;
     }
 

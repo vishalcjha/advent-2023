@@ -84,6 +84,37 @@ Right end can be found in similar way.
 
 More instrestingly variance comes into play with lifetime and reference. Will need to find time to describe the problem.
 
+Finally able to change from 
+```
+struct RaceCalculatorBuilder {
+    lines: Vec<String>,
+    pos: u8,
+}
+```
+to 
+```
+struct RaceCalculatorBuilder<'a> {
+    lines: Vec<&'a str>,
+    pos: u8,
+}
+```
+
+The issue is because mutable reference are invariant on T. Trick was to add explicit lifetime to following function.
+```
+fn add_next_line(&mut self, line: & str){
+        self.lines.push(line);
+        self.pos += 1;
+    }
+```
+Changing to 
+```
+fn add_next_line<'b>(&'b mut self, line: &'a str) {
+        self.lines.push(line);
+        self.pos += 1;
+    }
+```
+
+Details can be found at [Subtyping and Variance](https://doc.rust-lang.org/nomicon/subtyping.html)
 ### Day 7
 I have tried to keep interface of program same so that it can be used by both scenario.
 In this case, it is proved a bit tricky.
