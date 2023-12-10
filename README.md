@@ -156,3 +156,10 @@ Thankfully no trick for Saturday.
 Well I did find how to read vec in reverse in Rust
 `some_vec.iter().rev()` will read in reverse.
 NYC has nice sun today. Time to get much needed day light.
+
+### Day 10
+Part II again :disappointed:
+I am not able to understand following lines from challange.
+*In fact, there doesn't even need to be a full tile path to the outside for tiles to count as outside the loop - squeezing between pipes is also allowed! Here, I is still within the loop and O is still outside the loop:*
+This time not taking internet help. May want to comeback again.
+Part I was basic BFS.
