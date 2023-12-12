@@ -154,7 +154,6 @@ impl Maze {
     fn find_enclosed_ground_tile_count(&self) -> u32 {
         let main_loop = self.find_max_distance().1;
         let visited = RefCell::new(HashSet::<Coordinate>::new());
-        let mut loop_begin: Option<Coordinate> = None;
 
         let is_edge = |coordinate: &Coordinate| -> bool {
             coordinate.0 == 0
@@ -163,12 +162,36 @@ impl Maze {
                 || coordinate.1 == self.pipes[0].len() - 1
         };
 
-        // Not sure how to implement this. This is causing overcounting.
-        let is_closed_loop = || -> bool { true };
+        // To be inside closed pipe, number of intersection with path has to be odd.
+        let is_closed_loop = |coordinate: Coordinate| -> bool {
+            for change in vec![(1, 0), (0, 1)] {
+                let mut coordinate = coordinate.clone();
+                let mut cross_count = 0;
+                // help not to count when we walking one pipe after another.i.e. when in closed area.
+                let mut out = true;
+                while self.is_valid(coordinate.0 as i32, coordinate.1 as i32) {
+                    coordinate = Coordinate(coordinate.0 + change.0, coordinate.1 + change.1);
+                    if main_loop.contains(&coordinate) {
+                        if out {
+                            cross_count += 1;
+                            out = false;
+                        }
+                    } else {
+                        out = true;
+                    }
+                }
 
-        let mut visit_all_ground = |coordinate: Coordinate| -> Option<u32> {
+                //println!("Cross count for {:?} is {:?}", coordinate, cross_count);
+                if cross_count % 2 == 1 {
+                    return true;
+                }
+            }
+            false
+        };
+
+        let visit_all_connected_not_in_path = |coordinate: Coordinate| -> Option<u32> {
             let mut queue = VecDeque::new();
-            queue.push_back(coordinate);
+            queue.push_back(coordinate.clone());
             let mut found_edge = false;
             let mut count = 0;
             while let Some(next) = queue.pop_front() {
@@ -183,7 +206,6 @@ impl Maze {
                     if self.is_valid(next_row, next_col) {
                         let next = Coordinate(next_row as usize, next_col as usize);
                         if main_loop.contains(&next) {
-                            loop_begin = Some(next.clone());
                             continue;
                         }
                         if visited.borrow_mut().insert(next.clone()) {
@@ -193,7 +215,7 @@ impl Maze {
                 }
             }
 
-            if found_edge || !is_closed_loop() {
+            if found_edge || !is_closed_loop(coordinate) {
                 None
             } else {
                 Some(count)
@@ -206,7 +228,9 @@ impl Maze {
                 if !main_loop.contains(&Coordinate(r_index, c_index))
                     && visited.borrow_mut().insert(Coordinate(r_index, c_index))
                 {
-                    if let Some(enclosed) = visit_all_ground(Coordinate(r_index, c_index)) {
+                    if let Some(enclosed) =
+                        visit_all_connected_not_in_path(Coordinate(r_index, c_index))
+                    {
                         enclosed_tile_count += enclosed;
                     }
                 }
