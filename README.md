@@ -163,3 +163,6 @@ I am not able to understand following lines from challange.
 *In fact, there doesn't even need to be a full tile path to the outside for tiles to count as outside the loop - squeezing between pipes is also allowed! Here, I is still within the loop and O is still outside the loop:*
 This time not taking internet help. May want to comeback again.
 Part I was basic BFS.
+
+### Day 12
+Recursion + Memoization. Obviously Dynamic Programming would have been alternative too.
