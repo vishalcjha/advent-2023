@@ -166,3 +166,6 @@ Part I was basic BFS.
 
 ### Day 12
 Recursion + Memoization. Obviously Dynamic Programming would have been alternative too.
+
+### Day 13
+Problem it self is string comparison with simple loop.
