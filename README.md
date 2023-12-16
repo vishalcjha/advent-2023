@@ -173,3 +173,7 @@ Problem it self is string comparison with simple loop.
 ### Day 14
 HashMap does trick to find when a repeat would happen.
 Then just skip the repeating steps.
+
+### Day 16
+Got to be best problem in this edition. Simple enough to solve but has lots of nuances to consider.
+Thanks organizers for this.
