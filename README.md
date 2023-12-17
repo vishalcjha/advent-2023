@@ -177,3 +177,11 @@ Then just skip the repeating steps.
 ### Day 16
 Got to be best problem in this edition. Simple enough to solve but has lots of nuances to consider.
 Thanks organizers for this.
+
+### Day 17
+First attempt with DFS failed with stack overflow.
+Had to change to BDS.
+Overall problem took more time that I would want to spend :smiley:
+How to mark a position visited was interesting.
+`visited_map : HashMap<(Direction, Coordinate, StepInThisDirection), CostSoFar>`
+now when key matches compare new possible CostSoFar. If lesser than current entry continue with path. Or abandon path.
