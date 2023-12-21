@@ -185,3 +185,8 @@ Overall problem took more time that I would want to spend :smiley:
 How to mark a position visited was interesting.
 `visited_map : HashMap<(Direction, Coordinate, StepInThisDirection), CostSoFar>`
 now when key matches compare new possible CostSoFar. If lesser than current entry continue with path. Or abandon path.
+
+### Day 19
+With holiday season in swing, most likely will attempt first question.
+For second, will give max to 5 mins but that I know will not be enough.
+Happy Holidays :christmas_tree:
